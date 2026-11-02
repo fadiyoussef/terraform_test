@@ -10,10 +10,34 @@ resource "aws_security_group" "instance" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+# 1. Define the Security Group with SSH Ingress
+resource "aws_security_group" "allow_ssh" {
+  name        = "allow_ssh_sg"
+  description = "Allow inbound SSH traffic"
+
+  # Inbound Rules
+  ingress {
+    description = "SSH from anywhere"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # ⚠️ Opens SSH to the entire internet
+  }
+
+  # Outbound Rules (Terraform removes default AWS "allow-all" egress unless specified)
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
 resource "aws_instance" "example" {
   ami		= "ami-0b3f293126f3e2677"
   instance_type	= "t3.micro"
-  vpc_security_group_ids =[aws_security_group.instance.id]
+  vpc_security_group_ids =[aws_security_group.instance.id, aws_security_group.allow_ssh.id]
   user_data = <<-EOF
               #!/bin/bash
               echo "Hello, World" > index.html
