@@ -151,7 +151,7 @@ resource "aws_lb_target_group" "asg" {
 }
 resource "aws_lb_listener_rule" "asg" {
   # 1. Loop through your ports list
-  for_each     = toset(var.server_ports)
+  for_each     = toset([for port in var.server_ports : tostring(port)])
 
   # 2. Reference the specific listener port instance
   listener_arn = aws_lb_listener.http[each.key].arn
