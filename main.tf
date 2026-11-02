@@ -1,6 +1,9 @@
 provider "aws" {
   region = "ca-central-1"
 }
+data "aws_vpc" "default" {
+  default = true
+}
 variable "server_ports"{
   description = "open ports in use for browsing"
   type = list
@@ -65,9 +68,7 @@ data "aws_subnets" "default" {
   }
 }
 
-data "aws_vpc" "default" {
-  default = true
-}
+
 
 resource "aws_autoscaling_group" "example" {
   target_group_arns = values(aws_lb_target_group.asg)[*].arn
@@ -134,7 +135,7 @@ resource "aws_security_group" "alb" {
   }
 }
 resource "aws_lb_target_group" "asg" {
-  name = "terraform-asg-example"
+  name_prefix = "tg-"
   for_each    = toset([for port in var.server_ports : tostring(port)])
   port = each.value
   protocol = "HTTP"
