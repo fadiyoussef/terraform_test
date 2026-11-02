@@ -136,7 +136,7 @@ resource "aws_lb_target_group" "asg" {
   health_check {
     path = "/"
     protocol = "HTTP"
-    natcher = "200"
+    matcher = "200"
     interval = 15
     timeout = 3
     healthy_threshold = 2
