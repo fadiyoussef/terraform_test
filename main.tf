@@ -60,7 +60,7 @@ resource "aws_launch_template" "example" {
 }
 
 resource "aws_autoscaling_group" "example" {
-  desired_capacity   = 1
+  desired_capacity   = 2
   min_size =  2
   max_size = 10
   launch_template {
