@@ -93,11 +93,11 @@ resource "aws_lb" "example" {
   security_groups = [aws_security_group.alb.id]
 }
 resource "aws_lb_listener" "http" {
-  for_each          = toset(var.server_ports)
+  for_each          = toset([for port in var.server_ports : tostring(port)])
   load_balancer_arn = aws_lb.example.arn
-  port = each.value
-  protocol = "HTTP"
-  # Default action required by AWS (e.g., return a simple 404 text message)
+  port              = each.value
+  protocol          = "HTTP"
+
   default_action {
     type = "fixed-response"
 
@@ -108,6 +108,7 @@ resource "aws_lb_listener" "http" {
     }
   }
 }
+
 
 resource "aws_security_group" "alb" {
   name        = "terraform-alb-security-group"
@@ -134,7 +135,7 @@ resource "aws_security_group" "alb" {
 }
 resource "aws_lb_target_group" "asg" {
   name = "terraform-asg-example"
-  for_each          = toset(var.server_ports)
+  for_each    = toset([for port in var.server_ports : tostring(port)])
   port = each.value
   protocol = "HTTP"
   vpc_id = data.aws_subnets.default.id
