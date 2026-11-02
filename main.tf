@@ -42,8 +42,8 @@ resource "aws_security_group" "allow_ssh" {
   }
 }
 
-resource "aws_instance" "example" {
-  ami		= "ami-0b3f293126f3e2677"
+resource "aws_launch_configuration" "example" {
+  image_id		= "ami-0b3f293126f3e2677"
   instance_type	= "t3.micro"
   vpc_security_group_ids =[aws_security_group.instance.id, aws_security_group.allow_ssh.id]
   user_data = <<-EOF
