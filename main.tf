@@ -54,12 +54,12 @@ resource "aws_instance" "example" {
   instance_type	= "t3.micro"
   vpc_security_group_ids =[aws_security_group.instance.id, aws_security_group.allow_ssh.id]
   user_data = <<-EOF
-              #!/bin/bash
-              cd /var/
-              echo "Hello, World" > index.html
-              # Starts a native, lightweight web server on port 8080
-              nohup python3 -m http.server 8080 &
-              EOF
+  #!/bin/bash
+  cd /var/
+  echo "Hello, World" > index.html
+  # Starts a native, lightweight web server on port 8080
+  nohup python3 -m http.server 8080 &
+  EOF
   tags = {
     Name = "terraform-example"
   } 
