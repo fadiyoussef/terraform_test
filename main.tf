@@ -139,7 +139,7 @@ resource "aws_lb_target_group" "asg" {
   for_each    = toset([for port in var.server_ports : tostring(port)])
   port = each.value
   protocol = "HTTP"
-  vpc_id = data.aws_subnets.default.id
+  vpc_id = data.aws_vpc.default.id
   health_check {
     path = "/"
     protocol = "HTTP"
