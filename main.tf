@@ -10,15 +10,6 @@ resource "aws_security_group" "instance" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-resource "aws_security_group" "instance" {
-  name ="terraform-example.instance"
-  ingress{
-    from_port = 8080
-    to_port =8080
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
 resource "aws_instance" "example" {
   ami		= "ami-0b3f293126f3e2677"
   instance_type	= "t3.micro"
