@@ -149,20 +149,29 @@ resource "aws_lb_target_group" "asg" {
   }
 }
 resource "aws_lb_listener_rule" "asg" {
-  listener_arn = aws_lb_listener.http.arn
-  priority = 100
+  # 1. Loop through your ports list
+  for_each     = toset(var.server_ports)
+
+  # 2. Reference the specific listener port instance
+  listener_arn = aws_lb_listener.http[each.key].arn
+  
+  # 3. Create a unique priority per rule instance (e.g., 180, 8180)
+  priority     = 100 + each.value
   
   condition {
     path_pattern {
       values = ["*"]
     }
   }
+
   action {
-    type = "forward"
-    target_group_arn = aws_lb_target_group.asg.arn
+    type             = "forward"
+    # 4. Forward traffic directly to the matching backend target pool
+    target_group_arn = aws_lb_target_group.asg[each.key].arn
   }
 }
+
 output "alb_dns_name" {
-  value = aws_lb.example.dns_name
+  value       = aws_lb.example.dns_name
   description = "The domain name of the load balancer"
 }
