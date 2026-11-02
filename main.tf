@@ -58,11 +58,22 @@ resource "aws_launch_template" "example" {
     create_before_destroy = true
   }
 }
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+data "aws_vpc" "default" {
+  default = true
+}
 
 resource "aws_autoscaling_group" "example" {
   desired_capacity   = 2
   min_size =  2
   max_size = 10
+  vpc_zone_identifier = data.aws_subnets.default.ids
   launch_template {
     id      = aws_launch_template.example.id
     version = "$Latest" # Automatically uses the newest iteration of your template
