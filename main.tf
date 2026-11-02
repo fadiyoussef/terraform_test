@@ -2,7 +2,7 @@ provider "aws" {
   region = "ca-central-1"
 }
 resource "aws_s3_bucket" "terraform_state_fadi_2026" {
-  bucket = "terraform-up-and-running-state"
+  bucket = "terraform-up-and-running-state_fadi_2026_special_chicken"
   lifecycle {
     prevent_destroy = true
   }
