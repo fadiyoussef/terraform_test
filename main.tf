@@ -49,15 +49,14 @@ resource "aws_launch_template" "example" {
   network_interfaces {
   security_groups =[aws_security_group.instance.id, aws_security_group.allow_ssh.id]
   }
-  user_data = <<-EOF
-#!/bin/bash
-cd /var/
-echo "Hello, World" > index.html
-# Starts a native, lightweight web server on port 8080
-%{ for port in var.server_ports }
-nohup python3 -m http.server ${port} > /var/python-server-${port}.log 2>&1 &
-%{ endfor }
-EOF
+    user_data = base64encode(
+    templatefile("${path.module}/launch.sh", {
+      server_ports = var.server_ports
+    })
+  )
+    lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_autoscaling_group" "example" {
