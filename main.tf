@@ -7,7 +7,7 @@ data "aws_vpc" "default" {
 variable "server_ports"{
   description = "open ports in use for browsing"
   type = list
-  default = [80, 8080]
+  default = [80, 8080, 443]
 }
 resource "aws_security_group" "instance" {
   name ="terraform-example.instance"
