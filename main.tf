@@ -4,7 +4,7 @@ provider "aws" {
 resource "aws_s3_bucket" "terraform_state_fadi_2026" {
   bucket = "terraform-up-and-running-state-fadi-2026-special-chicken"
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 resource "aws_s3_bucket_versioning" "enabled" {
