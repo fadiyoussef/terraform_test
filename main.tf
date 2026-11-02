@@ -86,6 +86,12 @@ resource "aws_autoscaling_group" "example" {
     propagate_at_launch = true
   }
 }
+resource "aws_autoscaling_group" "example" {
+  # ... other configurations (vpc_zone_identifier, launch_template, etc.) ...
+
+  # FIX: Dynamically collects the ARNs from all target groups created by your for_each loop
+  target_group_arns = values(aws_lb_target_group.asg)[*.arn]
+}
 
 resource "aws_lb" "example" {
   name = "terraform-asg-example"
@@ -110,22 +116,28 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-resource "aws_security_group" "alb" {
-  name = "terraform-example-alb"
-  for_each          = toset(var.server_ports)
-  ingress = {
-    from_port = each.value
-    to_port = each.value
-    protocol = "tcp"
-    cidr_blocks =["0.0.0.0/0"]
+rresource "aws_security_group" "alb" {
+  name        = "terraform-alb-security-group"
+  description = "Managed by Terraform for load balancer mapping"
+
+  # FIX for Ingress: Changed from singular object mapping to a clean dynamic collection loop
+  dynamic "ingress" {
+    for_each = var.server_ports
+    content {
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
-   egress = {
-    from_port = each.value
-    to_port = each.value
-    protocol = "tcp"
-    cidr_blocks =["0.0.0.0/0"]
+
+  # FIX for Egress: Standard cloud load balancers should be allowed to talk outbound over any port
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
-  
 }
 resource "aws_lb_target_group" "asg" {
   name = "terraform-asg-example"
