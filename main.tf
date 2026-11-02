@@ -26,7 +26,7 @@ resource "aws_security_group" "instance" {
 }
 
 # 1. Define the Security Group with SSH Ingress
-resource "aws_security_group" "allow_ssh1" {
+resource "aws_security_group" "allow_ssh" {
   name        = "allow_ssh_sg"
   description = "Allow inbound SSH traffic"
 
@@ -51,7 +51,7 @@ resource "aws_security_group" "allow_ssh1" {
 resource "aws_instance" "example" {
   ami		= "ami-0b3f293126f3e2677"
   instance_type	= "t3.micro"
-  vpc_security_group_ids =[aws_security_group.instance.id, aws_security_group.allow_ssh1.id]
+  vpc_security_group_ids =[aws_security_group.instance.id, aws_security_group.allow_ssh.id]
   user_data = <<-EOF
   #!/bin/bash
   cd /var/
