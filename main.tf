@@ -70,7 +70,7 @@ data "aws_vpc" "default" {
 }
 
 resource "aws_autoscaling_group" "example" {
-  target_group_arns = values(aws_lb_target_group.asg)[*.arn]
+  target_group_arns = values(aws_lb_target_group.asg)[*].arn
   health_check_type = "ELB"
   desired_capacity   = 2
   min_size =  2
