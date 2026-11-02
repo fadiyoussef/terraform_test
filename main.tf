@@ -1,7 +1,7 @@
 provider "aws" {
   region = "ca-central-1"
 }
-resource "aws_s3_bucket" "terraform_state" {
+resource "aws_s3_bucket" "terraform_state_fadi" {
   bucket = "terraform-up-and-running-state"
   lifecycle {
     prevent_destroy = true
