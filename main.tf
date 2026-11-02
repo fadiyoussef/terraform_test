@@ -70,7 +70,7 @@ data "aws_vpc" "default" {
 }
 
 resource "aws_autoscaling_group" "example" {
-  target_group_arns = [aws_lb_target_group.asg.arn]
+  target_group_arns = values(aws_lb_target_group.asg)[*.arn]
   health_check_type = "ELB"
   desired_capacity   = 2
   min_size =  2
@@ -86,13 +86,6 @@ resource "aws_autoscaling_group" "example" {
     propagate_at_launch = true
   }
 }
-resource "aws_autoscaling_group" "example" {
-  # ... other configurations (vpc_zone_identifier, launch_template, etc.) ...
-
-  # FIX: Dynamically collects the ARNs from all target groups created by your for_each loop
-  target_group_arns = values(aws_lb_target_group.asg)[*.arn]
-}
-
 resource "aws_lb" "example" {
   name = "terraform-asg-example"
   load_balancer_type = "application"
