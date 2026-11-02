@@ -1,20 +1,20 @@
 provider "aws" {
   region = "ca-central-1"
 }
-resource "aws_s3_bucket" "terraform_state_fadi" {
+resource "aws_s3_bucket" "terraform_state_fadi_2026" {
   bucket = "terraform-up-and-running-state"
   lifecycle {
     prevent_destroy = true
   }
 }
 resource "aws_s3_bucket_versioning" "enabled" {
-  bucket = aws_s3_bucket.terraform_state_fadi.id
+  bucket = aws_s3_bucket.terraform_state_fadi_2026.id
   versioning_configuration {
     status = "Enabled"
   }
 }
 resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
-  bucket = aws_s3_bucket.terraform_state_fadi.id
+  bucket = aws_s3_bucket.terraform_state_fadi_2026.id
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
@@ -24,7 +24,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
 }
 
 resource "aws_s3_bucket_public_access_block" "public_access" {
-  bucket = aws_s3_bucket.terraform_state_fadi.id
+  bucket = aws_s3_bucket.terraform_state_fadi_2026.id
   block_public_acls = true
   block_public_policy = true
   ignore_public_acls = true
