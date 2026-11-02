@@ -9,7 +9,22 @@ resource "aws_security_group" "instance" {
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+   # Port 80 (HTTP)
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  # Port 443 (HTTPS)
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
+
 # 1. Define the Security Group with SSH Ingress
 resource "aws_security_group" "allow_ssh" {
   name        = "allow_ssh_sg"
@@ -40,6 +55,7 @@ resource "aws_instance" "example" {
   vpc_security_group_ids =[aws_security_group.instance.id, aws_security_group.allow_ssh.id]
   user_data = <<-EOF
               #!/bin/bash
+              cd /var/
               echo "Hello, World" > index.html
               # Starts a native, lightweight web server on port 8080
               nohup python3 -m http.server 8080 &
