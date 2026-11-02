@@ -116,7 +116,7 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-rresource "aws_security_group" "alb" {
+resource "aws_security_group" "alb" {
   name        = "terraform-alb-security-group"
   description = "Managed by Terraform for load balancer mapping"
 
