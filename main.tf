@@ -42,10 +42,13 @@ resource "aws_security_group" "allow_ssh" {
   }
 }
 
-resource "aws_launch_configuration" "example" {
+resource "aws_launch_template" "example" {
+  name_prefix   = "terraform-example-"
   image_id		= "ami-0b3f293126f3e2677"
   instance_type	= "t3.micro"
+  network_interfaces {
   security_groups =[aws_security_group.instance.id, aws_security_group.allow_ssh.id]
+  }
   user_data = <<-EOF
 #!/bin/bash
 cd /var/
@@ -58,9 +61,13 @@ EOF
 }
 
 resource "aws_autoscaling_group" "example" {
-  launch_configuration = aws_launch_configuration.example.name
-  min_size = 2
+  desired_capacity   = 1
+  min_size =  2
   max_size = 10
+  launch_template {
+    id      = aws_launch_template.example.id
+    version = "$Latest" # Automatically uses the newest iteration of your template
+  }
   tag {
     key = "Name"
     value = "terraform-asg-example"
