@@ -1,28 +1,22 @@
 provider "aws" {
   region = "ca-central-1"
 }
+variable "server_ports"{
+  description = "open ports in use for browsing"
+  type = list
+  default = [80, 8080, 443]
+}
 resource "aws_security_group" "instance" {
   name ="terraform-example.instance"
-  ingress{
-    from_port = 8080
-    to_port =8080
+  dynamic "ingress" {
+    for_each = var.server_ports 
+    content {
+    from_port = ingress.value
+    to_port = ingress.value
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-   # Port 80 (HTTP)
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  # Port 443 (HTTPS)
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+    }
+  }  
 }
 
 # 1. Define the Security Group with SSH Ingress
