@@ -70,6 +70,8 @@ data "aws_vpc" "default" {
 }
 
 resource "aws_autoscaling_group" "example" {
+  target_group_arns = [aws_lb_target_group.asg.arn]
+  health_check_type = "ELB"
   desired_capacity   = 2
   min_size =  2
   max_size = 10
@@ -83,4 +85,79 @@ resource "aws_autoscaling_group" "example" {
     value = "terraform-asg-example"
     propagate_at_launch = true
   }
+}
+
+resource "aws_lb" "example" {
+  name = "terraform-asg-example"
+  load_balancer_type = "application"
+  subnets = data.aws_subnets.default.ids
+  security_groups = [aws_security_group.alb.id]
+}
+resource "aws_lb_listener" "http" {
+  for_each          = toset(var.server_ports)
+  load_balancer_arn = aws_lb.example.arn
+  port = each.value
+  protocol = "HTTP"
+  # Default action required by AWS (e.g., return a simple 404 text message)
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "404: page not found"
+      status_code  = "404"
+    }
+  }
+}
+
+resource "aws_security_group" "alb" {
+  name = "terraform-example-alb"
+  for_each          = toset(var.server_ports)
+  ingress = {
+    from_port = each.value
+    to_port = each.value
+    protocol = "tcp"
+    cidr_blocks =["0.0.0.0/0"]
+  }
+   egress = {
+    from_port = each.value
+    to_port = each.value
+    protocol = "tcp"
+    cidr_blocks =["0.0.0.0/0"]
+  }
+  
+}
+resource "aws_lb_target_group" "asg" {
+  name = "terraform-asg-example"
+  for_each          = toset(var.server_ports)
+  port = each.value
+  protocol = "HTTP"
+  vpc_id = data.aws_subnets.default.id
+  health_check {
+    path = "/"
+    protocol = "HTTP"
+    natcher = "200"
+    interval = 15
+    timeout = 3
+    healthy_threshold = 2
+    unhealthy_threshold = 2
+  }
+}
+resource "aws_lb_listener_rule" "asg" {
+  listener_arn = aws_lb_listener.http.arn
+  priority = 100
+  
+  condition {
+    path_pattern {
+      values = ["*"]
+    }
+  }
+  action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.asg.arn
+  }
+}
+output "alb_dns_name" {
+  value = aws_lb.example.dns_name
+  descdescription = "The domain name of the load balancer"
 }
