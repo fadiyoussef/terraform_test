@@ -51,7 +51,13 @@ resource "aws_instance" "example" {
   cd /var/
   echo "Hello, World" > index.html
   # Starts a native, lightweight web server on port 8080
-  nohup python3 -m http.server 8080 &
+  dynamic "matching_ports"
+  {
+    for_each = var.server_ports 
+    content{
+    nohup python3 -m http.server matching_ports &
+    }
+  }
   EOF
   tags = {
     Name = "terraform-example"
